@@ -1,132 +1,153 @@
-// function Contact() {
-//   return (
-//     <div className="min-h-screen px-10 py-20">
-//       <h1 className="text-4xl font-bold text-cyan-400 mb-8">Contact Me</h1>
 
-//       <form className="max-w-xl mx-auto bg-gray-900 p-8 rounded-xl shadow-lg">
-//         <input
-//           type="text"
-//           placeholder="Your Name"
-//           className="w-full p-3 mb-4 rounded bg-gray-800"
-//         />
-
-//         <input
-//           type="email"
-//           placeholder="Your Email"
-//           className="w-full p-3 mb-4 rounded bg-gray-800"
-//         />
-
-//         <textarea
-//           placeholder="Your Message"
-//           className="w-full p-3 mb-4 rounded bg-gray-800"
-//           rows="5"
-//         ></textarea>
-
-//         <button className="bg-cyan-500 px-6 py-3 rounded-lg hover:bg-cyan-700">
-//           Send Message
-//         </button>
-//       </form>
-//     </div>
-//   );
-// }
 
 // export default Contact;
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
 function Contact() {
-  const contactInfo = [
-    {
-      title: "Email",
-      value: "harshtul0502@gmail.com",
-      icon: "📧",
-      description:
-        "Feel free to contact me anytime for project discussions, freelance work, or collaborations.",
-    },
-    {
-      title: "Phone",
-      value: "+91 8238404425",
-      icon: "📱",
-      description:
-        "Available for direct communication regarding job opportunities and project work.",
-    },
-    {
-      title: "Location",
-      value: "Ahmedabad, Gujarat, India",
-      icon: "📍",
-      description:
-        "Currently based in Ahmedabad and open for both remote and on-site opportunities.",
-    },
+  const contacts = [
+    { icon: "📧", title: "Email", value: "harshtul0502@gmail.com" },
+    { icon: "📱", title: "Phone", value: "+91 8238404425" },
+    { icon: "📍", title: "Location", value: "Ahmedabad, Gujarat" },
   ];
 
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      mobile: "",
+      message: "",
+    },
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(3, "Name must be at least 3 characters")
+        .required("Name is required"),
+
+      email: Yup.string()
+        .email("Invalid email address")
+        .required("Email is required"),
+
+      mobile: Yup.string()
+        .matches(/^[0-9]{10}$/, "Mobile number must be exactly 10 digits")
+        .required("Mobile number is required"),
+
+      message: Yup.string()
+        .min(10, "Message must be at least 10 characters")
+        .required("Message is required"),
+    }),
+    onSubmit: (values, { resetForm }) => {
+      console.log(values);
+      alert("Message Sent Successfully!");
+      resetForm();
+    },
+  });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-950 to-gray-900 text-white px-8 py-20">
-      
+    <div className="min-h-screen px-6 md:px-12 py-20 bg-gray-950 text-white">
       {/* Heading */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl font-bold text-cyan-400 mb-4">
-          Get In Touch
-        </h1>
-        <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-          I’m always excited to connect with new people, discuss creative ideas,
-          and explore opportunities in web development and design.
-        </p>
-      </div>
+      <h1 className="text-5xl font-bold text-center text-cyan-400 mb-16">
+        Contact Me
+      </h1>
 
       {/* Contact Cards */}
-      <div className="grid md:grid-cols-3 gap-8 mb-20">
-        {contactInfo.map((item, index) => (
+      <div className="grid md:grid-cols-3 gap-8 mb-16">
+        {contacts.map((item, index) => (
           <div
             key={index}
-            className="bg-gray-800 p-8 rounded-2xl shadow-lg hover:scale-105 transition duration-300"
+            className="bg-gray-900 p-8 rounded-2xl shadow-lg text-center hover:scale-105 transition duration-300"
           >
-            <div className="text-4xl mb-4">{item.icon}</div>
-
-            <h2 className="text-2xl font-bold mb-3">{item.title}</h2>
-
-            <p className="text-cyan-400 text-lg mb-4">{item.value}</p>
-
-            <p className="text-gray-400 leading-7">{item.description}</p>
+            <div className="text-5xl mb-4">{item.icon}</div>
+            <h2 className="text-2xl font-bold mb-2">{item.title}</h2>
+            <p className="text-gray-400">{item.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Availability Section */}
-      <div className="bg-gray-800 p-10 rounded-2xl shadow-lg text-center mb-20">
-        <h2 className="text-4xl font-bold text-cyan-400 mb-6">
-          Availability
+      {/* Contact Form */}
+      <div className="max-w-3xl mx-auto bg-gray-900 p-8 rounded-2xl shadow-xl">
+        <h2 className="text-3xl font-bold text-cyan-400 text-center mb-8">
+          Send Me a Message
         </h2>
 
-        <p className="text-gray-300 text-lg leading-8 max-w-3xl mx-auto">
-          I am currently available for freelance projects, internships, and
-          frontend development opportunities. If you have an exciting idea or
-          project, feel free to reach out and let's build something great together.
-        </p>
+        <form onSubmit={formik.handleSubmit} className="space-y-6">
+          {/* Name */}
+          <div>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter your name"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.name}
+              className="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-cyan-400"
+            />
+            {formik.touched.name && formik.errors.name && (
+              <p className="text-red-400 mt-2">{formik.errors.name}</p>
+            )}
+          </div>
+
+          {/* Email */}
+          <div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.email}
+              className="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-cyan-400"
+            />
+            {formik.touched.email && formik.errors.email && (
+              <p className="text-red-400 mt-2">{formik.errors.email}</p>
+            )}
+          </div>
+
+          {/* Mobile Number */}
+          <div>
+            <input
+              type="tel"
+              name="mobile"
+              placeholder="Enter your mobile number"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.mobile}
+              className="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-cyan-400"
+            />
+            {formik.touched.mobile && formik.errors.mobile && (
+              <p className="text-red-400 mt-2">{formik.errors.mobile}</p>
+            )}
+          </div>
+
+          {/* Message */}
+          <div>
+            <textarea
+              name="message"
+              rows="5"
+              placeholder="Write your message..."
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.message}
+              className="w-full p-4 rounded-xl bg-gray-800 border border-gray-700 focus:outline-none focus:border-cyan-400"
+            />
+            {formik.touched.message && formik.errors.message && (
+              <p className="text-red-400 mt-2">{formik.errors.message}</p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-cyan-500 py-4 rounded-xl text-lg font-semibold hover:bg-cyan-600 transition duration-300"
+          >
+            Send Message
+          </button>
+        </form>
       </div>
 
-      {/* Social Links */}
-      <div className="text-center">
-        <h2 className="text-4xl font-bold text-cyan-400 mb-8">
-          Connect With Me
-        </h2>
-
-        <div className="flex justify-center gap-8 text-4xl">
-          <a href="#" className="hover:text-cyan-400 transition duration-300">
-            💻
-          </a>
-
-          <a href="#" className="hover:text-cyan-400 transition duration-300">
-            🔗
-          </a>
-
-          <a href="#" className="hover:text-cyan-400 transition duration-300">
-            📷
-          </a>
-
-          <a href="#" className="hover:text-cyan-400 transition duration-300">
-            🐦
-          </a>
-        </div>
-
-        <p className="text-gray-400 mt-6">
-          You can connect with me through social media and professional platforms.
+      {/* Bottom Text */}
+      <div className="text-center mt-16">
+        <p className="text-gray-400 text-lg">
+          Let’s collaborate and build something amazing together.
         </p>
       </div>
     </div>
